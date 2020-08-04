@@ -3,55 +3,59 @@ package com.luizgareis.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.luizgareis.models.Person;
+import com.luizgareis.data.dto.PersonDTO;
+import com.luizgareis.data.dto.v2.PersonDTOV2;
 import com.luizgareis.service.PersonService;
 
+@RequestMapping(path = "api/v1/person", 
+				produces = {"application/json","application/xml", "application/x-yaml"},
+				consumes = {"application/json","application/xml", "application/x-yaml"})
 @RestController
-@RequestMapping("/person")
 public class PersonController {
 	
 	@Autowired
 	private PersonService service;
 	
-	@RequestMapping(value = "/{id}", 
-			method = RequestMethod.GET,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public Person findById(@PathVariable(value = "id") String id) {
+	@GetMapping(value = "/{id}")
+	public PersonDTO findById(@PathVariable(value = "id") Long id) {
 		return service.findById(id);
 	}
 	
-	
 	@GetMapping
-	public List<Person> findAll() {
+	public List<PersonDTO> findAll() {
 		return service.findAll();
 	}
 	
-	@RequestMapping(method = RequestMethod.POST,
-			produces = MediaType.APPLICATION_JSON_VALUE,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Person create(@RequestBody Person person) {
+	@PostMapping
+	public PersonDTO create(@RequestBody PersonDTO person) {
 		return service.create(person);
 	}
 	
-	@RequestMapping(method = RequestMethod.PUT,
-			produces = MediaType.APPLICATION_JSON_VALUE,
-			consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Person update(@RequestBody Person person) {
+	@PostMapping("/v2")
+	public PersonDTOV2 createV2(@RequestBody PersonDTOV2 person) {
+		return service.createV2(person);
+	}
+	
+	@PutMapping
+	public PersonDTO update(@RequestBody PersonDTO person) {
 		return service.update(person);
 	}
 	
-	@RequestMapping(value = "/{id}", 
-			method = RequestMethod.DELETE)
-	public void delete(@PathVariable(value = "id") String id) {
+	@SuppressWarnings("rawtypes")
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity delete(@PathVariable(value = "id") Long id) {
 		 service.delete(id);
+		 return ResponseEntity.ok().build();
 	}
 	
 }
